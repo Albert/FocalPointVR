@@ -1,0 +1,78 @@
+-------------
+-- Scripts --
+-------------
+
+UNATTACHED
+  Class Focal Point.cs
+    vec3 position
+    bool isActive
+    vec3 origin (can be null)
+
+TO OBJECTS THAT ARE HANDLEABLE
+  Focal Point Handler.cs
+    public:
+      bool lock translation
+      bool lock rotation
+      bool lock scale
+      bool keeps translation inertia on release
+      bool keeps rotation inertia on release
+      bool keeps scale inertia on release
+
+TO CONTROLLERS
+  Focal Point Subject Selector.cs
+    public:
+      subject (reports it to interaction layer)
+
+  Focal Point Maker.cs
+    public:
+      List<FocalPoint> focalPoints
+
+TO FOCAL POINT INTERACTION LAYER
+  Focal Point Interaction Manager.cs
+    public List<GameObject> controllers
+    public GameObject FocalPointTemplate (can be left empty to not render)
+
+TO FOCAL POINT TEMPLATE (referenced in focal point maker)
+  Focal Point Renderer.cs
+    public color when hover
+    public color when active
+    public Sprite RaySprite (can be left empty to not render sprite) (optional)
+
+
+---------------
+-- Game Objs --
+---------------
+
+Game Scene
+  typical heirarchy
+
+Camera Rig (Vive-specific)
+  Controller Left
+    FocalPoint 1
+    FocalPoint 2  // sometimes focal points have lasers, sometimes they don't
+    Laser 2
+      sprite 1
+      sprite 2
+    FocalPoint 3
+    Laser 3
+      sprite 1
+      sprite 2
+
+  Controller Right
+    FocalPoint
+    Laser
+      sprite 1
+      sprite 2
+    FocalPoint
+    Laser
+      sprite 1
+      sprite 2
+
+  Camera
+
+Interaction Layer
+  Game Subject (whenever being interacted with)
+
+// down below in prefabs
+Prefabs
+  Focal Point Template
