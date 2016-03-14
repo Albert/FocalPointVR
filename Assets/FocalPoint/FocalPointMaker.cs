@@ -15,82 +15,17 @@ public class FocalPointMaker : MonoBehaviour {
 
 	void Update () {
 		sameAsLastFrame = true;
-		//translator ();
-		//scaler ();
-		//twoPointRotator();
+//		translator ();
+//		scaler ();
+//		twoPointRotator();
 		threePointRotator();
 	}
 
-	void translator() {
-		if (controllerMover.clickIsDown) {
-			sameAsLastFrame = false;
-			GameObject point1 = Instantiate(focalPointTemplate, Vector3.up * 2.0f, Quaternion.identity) as GameObject;
-			point1.transform.SetParent (transform, false);
-			focalPoints.Add (point1);
-		} else if (controllerMover.clickIsUp) {
-			removePoints ();
-		}
-	}
-
-	void scaler() {
-		if (controllerMover.clickIsDown) {
-			sameAsLastFrame = false;
-			Vector3 position1 = new Vector3 (Mathf.Sin (Time.time), 0.0f, 0.0f);
-			GameObject point1 = Instantiate (focalPointTemplate, position1, Quaternion.identity) as GameObject;
-			point1.transform.SetParent (transform, false);
-			focalPoints.Add (point1);
-
-			Vector3 position2 = new Vector3 (-2.0f, 0.0f, 0.0f);
-			GameObject point2 = Instantiate (focalPointTemplate, position2, Quaternion.identity) as GameObject;
-			point2.transform.SetParent (transform, false);
-			focalPoints.Add (point2);
-		} else if (controllerMover.clickIsUp) {
-			removePoints ();
-		} else if (controllerMover.clickIsActive) {
-			Vector3 position1 = new Vector3 (Mathf.Sin (Time.time), 0.0f, 0.0f);
-			focalPoints [0].transform.localPosition = position1;
-			Vector3 position2 = new Vector3 (-2.0f, 0.0f, 0.0f);
-			focalPoints [1].transform.localPosition = position2;
-		}
-	}
-
-	void twoPointRotator() {
-		if (controllerMover.clickIsDown) {
-			sameAsLastFrame = false;
-			Vector3 position1 = new Vector3 (0.0f, 3.0f, 0.0f);
-			GameObject point1 = Instantiate (focalPointTemplate, position1, Quaternion.identity) as GameObject;
-			point1.transform.SetParent (transform, false);
-			focalPoints.Add (point1);
-
-			Vector3 position2 = new Vector3 (-2.0f, 0.0f, 0.0f);
-			GameObject point2 = Instantiate (focalPointTemplate, position2, Quaternion.identity) as GameObject;
-			point2.transform.SetParent (transform, false);
-			focalPoints.Add (point2);
-		} else if (controllerMover.clickIsUp) {
-			removePoints ();
-		}
-	}
-
-	void threePointRotator() {
-		if (controllerMover.clickIsDown) {
-			sameAsLastFrame = false;
-			Vector3 position1 = new Vector3 (-2.0f, 0.0f, 0.0f);
-			GameObject point1 = Instantiate (focalPointTemplate, position1, Quaternion.identity) as GameObject;
-			point1.transform.SetParent (transform, false);
-			focalPoints.Add (point1);
-
-			Vector3 position2 = new Vector3 (-2.0f, -3.0f, 0.0f);
-			GameObject point2 = Instantiate (focalPointTemplate, position2, Quaternion.identity) as GameObject;
-			point2.transform.SetParent (transform, false);
-			focalPoints.Add (point2);
-
-			Vector3 position3 = new Vector3 (0.0f, -3.0f, 0.0f);
-			GameObject point3 = Instantiate (focalPointTemplate, position3, Quaternion.identity) as GameObject;
-			point3.transform.SetParent (transform, false);
-			focalPoints.Add (point3);
-		} else if (controllerMover.clickIsUp) {
-			removePoints ();
-		}
+	void addPoint(Vector3 pointLocation) {
+		sameAsLastFrame = false;
+		GameObject newPoint = Instantiate(focalPointTemplate, pointLocation, Quaternion.identity) as GameObject;
+		newPoint.transform.SetParent (transform, false);
+		focalPoints.Add (newPoint);
 	}
 
 	void removePoints() {
@@ -99,6 +34,47 @@ public class FocalPointMaker : MonoBehaviour {
 			Destroy (focalPoint);
 		}
 		focalPoints.Clear ();
+	}
+
+	void translator() {
+		if (controllerMover.clickIsDown) {
+			addPoint (Vector3.up * 2.0f);
+		} else if (controllerMover.clickIsUp) {
+			removePoints ();
+		}
+	}
+
+	void scaler() {
+		Vector3 point0 = new Vector3 (Mathf.Sin (Time.time), 0.0f, 0.0f);
+		Vector3 point1 = new Vector3 (-2.0f, 0.0f, 0.0f);
+		if (controllerMover.clickIsDown) {
+			addPoint (point0);
+			addPoint (point1);
+		} else if (controllerMover.clickIsUp) {
+			removePoints ();
+		} else if (controllerMover.clickIsActive) {
+			focalPoints [0].transform.localPosition = point0;
+			focalPoints [1].transform.localPosition = point1;
+		}
+	}
+
+	void twoPointRotator() {
+		if (controllerMover.clickIsDown) {
+			addPoint (new Vector3 (0.0f, 3.0f, 0.0f));
+			addPoint (new Vector3 (-2.0f, 0.0f, 0.0f));
+		} else if (controllerMover.clickIsUp) {
+			removePoints ();
+		}
+	}
+
+	void threePointRotator() {
+		if (controllerMover.clickIsDown) {
+			addPoint (new Vector3 (-2.0f, 0.0f, 0.0f));
+			addPoint (new Vector3 (-2.0f, -3.0f, 0.0f));
+			addPoint (new Vector3 (0.0f, -3.0f, 0.0f));
+		} else if (controllerMover.clickIsUp) {
+			removePoints ();
+		}
 	}
 
 	// TODO make this smarter
