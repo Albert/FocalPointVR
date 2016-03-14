@@ -1,30 +1,30 @@
-Manipulator should be able to (or, Unity dev should feel enabled to create experiences where end users are able to)
-  WORK WITH POINTS OF TRACTION
-    assert physical 3d points
-    activate points
-    see the focal points
-  SELECT THINGS
-    select objects
-    change scope of selection
-  MANIPULATE
-    translate by moving focal points
-    scale by moving 2 or more points
-    rotate by moving 2 or more points
-    throw things (kinematic vs non, and the transition)
+[ ] Manipulator should be able to (or, Unity dev should feel enabled to create experiences where end users are able to)
+[x]   WORK WITH POINTS OF TRACTION
+[x]     assert physical 3d points
+[x]     activate points
+[x]     see the focal points
+[ ]   SELECT THINGS
+[ ]     select objects
+[ ]     change scope of selection
+[ ]   MANIPULATE
+[x]     translate by moving focal points
+[x]     scale by moving 2 or more points
+[x]     rotate by moving 2 or more points
+[ ]     throw things (kinematic vs non, and the transition)
 
-Unity Dev should be able to
-  LEARN
-    see a demo of the tech to understand how it works
-    read tips on affordance and training the users
-  CUSTOMIZATION
-    identify if an object should be freely movable in all dims or not
-    customize how focal points get placed
-    customize how focal points look
-    customize how lasers look
-  THINK META
-    learn about licensing
-    get alerts for updates (don't know how Unity handles this)
+[ ] Unity Dev should be able to
+[ ]   LEARN
+[ ]     see a demo of the tech to understand how it works
+[ ]     read tips on affordance and training the users
+[ ]   CUSTOMIZATION
+[ ]     identify if an object should be freely movable in all dims or not
+[ ]     customize how focal points get placed
+[ ]     customize how focal points look
+[ ]     customize how lasers look
+[ ]   THINK META
+[ ]     learn about licensing
+[ ]     get alerts for updates (don't know how Unity handles this)
 
-Library Dev should be able to
-  send / retrieve / review PRs
-  push updates
+[ ] Library Dev should be able to
+[ ]   send / retrieve / review PRs
+[ ]   push updates
