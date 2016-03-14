@@ -19,42 +19,9 @@ public class FocalPointManager : MonoBehaviour {
 
 	void LateUpdate() {
 		updatePointsIfNecessary ();
-
-		// translation
-		if (focalPoints.Count > 0) {
-			Vector3 averagePoint = new Vector3();
-			foreach (GameObject point in focalPoints) {
-				averagePoint += point.transform.position;
-			}
-			averagePoint /= focalPoints.Count;
-			transform.position = averagePoint;
-		}
-
-		// scale
-		if (focalPoints.Count > 1) {
-			float averageDistance = 0;
-			foreach (GameObject pointA in focalPoints) {
-				foreach (GameObject pointB in focalPoints) {
-					if (pointA != pointB) {
-						averageDistance += (pointA.transform.position - pointB.transform.position).magnitude;
-					}
-				}
-			}
-			averageDistance /= focalPoints.Count;
-			transform.localScale = new Vector3 (averageDistance, averageDistance, averageDistance);
-		}
-
-		// rotation
-		if (focalPoints.Count == 2) {
-			Quaternion currentRotation = Quaternion.LookRotation (focalPoints [0].transform.position - focalPoints [1].transform.position);
-			transform.rotation = currentRotation;
-		} else if (focalPoints.Count == 3) {
-			// TODO This is a guess... needs to be tested out properly
-			Plane myPlane = new Plane (focalPoints [0].transform.position, focalPoints [1].transform.position, focalPoints [2].transform.position);
-			transform.LookAt (myPlane.normal);
-		} else if (focalPoints.Count > 3) {
-			// TODO I have no idea how to solve for this
-		}
+		applyTranslation ();
+		applyScale ();
+		applyRotation ();
 
 		if (anyPointChangedThisFrame) {
 			if (subject.transform.parent != transform) {
@@ -85,6 +52,51 @@ public class FocalPointManager : MonoBehaviour {
 			foreach (FocalPointRenderer renderer in renderers) {
 				focalPoints.Add (renderer.gameObject);  // TODO is there a way to do this faster w/ addRange?
 			}
+		}
+	}
+
+	void applyTranslation() {
+		if (focalPoints.Count > 0) {
+			Vector3 averagePoint = new Vector3();
+			foreach (GameObject point in focalPoints) {
+				averagePoint += point.transform.position;
+			}
+			averagePoint /= focalPoints.Count;
+			transform.position = averagePoint;
+		}
+	}
+
+	void applyScale() {
+		if (focalPoints.Count > 1) {
+			float averageDistance = 0;
+			foreach (GameObject pointA in focalPoints) {
+				foreach (GameObject pointB in focalPoints) {
+					if (pointA != pointB) {
+						averageDistance += (pointA.transform.position - pointB.transform.position).magnitude;
+					}
+				}
+			}
+			averageDistance /= focalPoints.Count;
+			transform.localScale = new Vector3 (averageDistance, averageDistance, averageDistance);
+		}
+	}
+
+	void applyRotation() {
+		if (focalPoints.Count == 2) {
+			Quaternion currentRotation = Quaternion.LookRotation (focalPoints [0].transform.position - focalPoints [1].transform.position);
+			transform.rotation = currentRotation;
+		} else if (focalPoints.Count == 3) {
+			// TODO Talk to a proper comp sci person about a better way to do this...
+			Vector3 directionToLook = focalPoints [1].transform.position - focalPoints [0].transform.position;
+			transform.LookAt (transform.position + directionToLook);
+			Vector3 referenceDirection = focalPoints [2].transform.position - focalPoints [0].transform.position;
+			Vector3 projectedReference = Vector3.ProjectOnPlane (referenceDirection, transform.forward);
+			float levelingAngle = Vector3.Angle (transform.right, projectedReference);
+			float sign = Vector3.Cross(transform.InverseTransformDirection(transform.right), projectedReference).z < 0 ? -1 : 1;
+			levelingAngle *= sign;
+			transform.Rotate (transform.InverseTransformDirection(transform.forward), levelingAngle);
+		} else if (focalPoints.Count > 3) {
+			// TODO I have no idea how to solve for this
 		}
 	}
 }

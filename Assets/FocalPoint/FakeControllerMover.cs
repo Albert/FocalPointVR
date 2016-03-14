@@ -12,7 +12,8 @@ public class FakeControllerMover : MonoBehaviour {
 	}
 
 	void Update () {
-		debugRotate ();
+		//debugRotate ();
+		debugCrazyRotate ();
 		debugMove ();
 		clickIsActive = Input.GetKey ("space");
 		clickIsDown = Input.GetKeyDown ("space");
@@ -26,4 +27,11 @@ public class FakeControllerMover : MonoBehaviour {
 	void debugRotate() {
 		transform.Rotate (Vector3.right, Time.deltaTime * 50.0f);
 	}
+
+	void debugCrazyRotate () {
+		transform.Rotate (Vector3.right, Time.deltaTime * 50.0f);
+		transform.Rotate (Vector3.up, Time.deltaTime * 70.0f);
+		transform.Rotate (Vector3.forward, Time.deltaTime * 60.0f);
+	}
+
 }
