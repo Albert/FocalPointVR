@@ -50,7 +50,9 @@ public class FocalPointManager : MonoBehaviour {
 		foreach (FocalPointMaker maker in makers) {
 			FocalPointRenderer[] renderers = maker.transform.GetComponentsInChildren<FocalPointRenderer> ();
 			foreach (FocalPointRenderer renderer in renderers) {
-				focalPoints.Add (renderer.gameObject);  // TODO is there a way to do this faster w/ addRange?
+				if (renderer.isActive) {
+					focalPoints.Add (renderer.gameObject);  // TODO is there a way to do this faster w/ addRange?
+				}
 			}
 		}
 	}

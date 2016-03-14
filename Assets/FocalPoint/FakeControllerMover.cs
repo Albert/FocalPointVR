@@ -2,8 +2,6 @@
 using System.Collections;
 
 public class FakeControllerMover : MonoBehaviour {
-
-	public bool clickIsActive;
 	public bool clickIsDown;
 	public bool clickIsUp;
 
@@ -15,7 +13,6 @@ public class FakeControllerMover : MonoBehaviour {
 		//debugRotate ();
 		debugCrazyRotate ();
 		debugMove ();
-		clickIsActive = Input.GetKey ("space");
 		clickIsDown = Input.GetKeyDown ("space");
 		clickIsUp = Input.GetKeyUp ("space");
 	}
