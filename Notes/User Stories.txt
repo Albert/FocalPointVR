@@ -17,7 +17,7 @@
 [ ]     see a demo of the tech to understand how it works
 [ ]     read tips on affordance and training the users
 [ ]   CUSTOMIZATION
-[ ]     identify if an object should be freely movable in all dims or not
+[x]     identify if an object should be freely movable in all dims or not
 [ ]     customize how focal points get placed
 [ ]     customize how focal points look
 [ ]     customize how lasers look

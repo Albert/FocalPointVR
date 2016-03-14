@@ -5,11 +5,13 @@ using System.Collections.Generic;
 public class FocalPointManager : MonoBehaviour {
 	public GameObject subject;
 	private Transform previousSubjectParent;
+	private FocalPointHandler subjectHandlerSettings;
 	private FocalPointMaker[] makers;
 	private List<GameObject> focalPoints;
 	private bool anyPointChangedThisFrame = false;
 
 	void Start () {
+		subjectHandlerSettings = subject.GetComponent<FocalPointHandler> ();
 		makers = FindObjectsOfType(typeof(FocalPointMaker)) as FocalPointMaker[];
 		focalPoints = new List<GameObject> ();
 	}
@@ -59,17 +61,21 @@ public class FocalPointManager : MonoBehaviour {
 
 	void applyTranslation() {
 		if (focalPoints.Count > 0) {
-			Vector3 averagePoint = new Vector3();
-			foreach (GameObject point in focalPoints) {
-				averagePoint += point.transform.position;
+			if (subjectHandlerSettings.lockTranslation) {
+				transform.position = subject.transform.position;
+			} else {
+				Vector3 averagePoint = new Vector3();
+				foreach (GameObject point in focalPoints) {
+					averagePoint += point.transform.position;
+				}
+				averagePoint /= focalPoints.Count;
+				transform.position = averagePoint;
 			}
-			averagePoint /= focalPoints.Count;
-			transform.position = averagePoint;
 		}
 	}
 
 	void applyScale() {
-		if (focalPoints.Count > 1) {
+		if (focalPoints.Count > 1 && !subjectHandlerSettings.lockScale) {
 			float averageDistance = 0;
 			foreach (GameObject pointA in focalPoints) {
 				foreach (GameObject pointB in focalPoints) {
@@ -84,10 +90,10 @@ public class FocalPointManager : MonoBehaviour {
 	}
 
 	void applyRotation() {
-		if (focalPoints.Count == 2) {
+		if (focalPoints.Count == 2 && !subjectHandlerSettings.lockRotation) {
 			Quaternion currentRotation = Quaternion.LookRotation (focalPoints [0].transform.position - focalPoints [1].transform.position);
 			transform.rotation = currentRotation;
-		} else if (focalPoints.Count == 3) {
+		} else if (focalPoints.Count == 3 && !subjectHandlerSettings.lockRotation) {
 			// TODO Talk to a proper comp sci person about a better way to do this...
 			Vector3 directionToLook = focalPoints [1].transform.position - focalPoints [0].transform.position;
 			transform.LookAt (transform.position + directionToLook);
@@ -97,7 +103,7 @@ public class FocalPointManager : MonoBehaviour {
 			float sign = Vector3.Cross(transform.InverseTransformDirection(transform.right), projectedReference).z < 0 ? -1 : 1;
 			levelingAngle *= sign;
 			transform.Rotate (transform.InverseTransformDirection(transform.forward), levelingAngle);
-		} else if (focalPoints.Count > 3) {
+		} else if (focalPoints.Count > 3 && !subjectHandlerSettings.lockRotation) {
 			// TODO I have no idea how to solve for this
 		}
 	}
