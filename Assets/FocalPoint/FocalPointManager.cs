@@ -49,10 +49,13 @@ public class FocalPointManager : MonoBehaviour {
 
 	void updatePoints() {
 		focalPoints.Clear ();
+		FocalPointHandler fPointHandler = subject.GetComponent<FocalPointHandler> ();
+		fPointHandler.setFakeActive (false);
 		foreach (FocalPointMaker maker in makers) {
 			FocalPointRenderer[] renderers = maker.transform.GetComponentsInChildren<FocalPointRenderer> ();
 			foreach (FocalPointRenderer renderer in renderers) {
 				if (renderer.isActive) {
+					fPointHandler.setFakeActive (true);
 					focalPoints.Add (renderer.gameObject);  // TODO is there a way to do this faster w/ addRange?
 				}
 			}
