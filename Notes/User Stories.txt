@@ -6,11 +6,11 @@
 [ ]   SELECT THINGS
 [ ]     select objects
 [ ]     change scope of selection
-[ ]   MANIPULATE
+[x]   MANIPULATE
 [x]     translate by moving focal points
 [x]     scale by moving 2 or more points
 [x]     rotate by moving 2 or more points
-[ ]     throw things (kinematic vs non, and the transition)
+[x]     throw things (kinematic vs non, and the transition)
 
 [ ] Unity Dev should be able to
 [ ]   LEARN
