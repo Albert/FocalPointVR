@@ -13,8 +13,8 @@ public class FocalPointMaker : MonoBehaviour {
 		focalPoints = new List<GameObject> ();
 //		startTranslator ();
 //		startScaler ();
-//		startTwoPointRotator();
-		startThreePointRotator();
+		startTwoPointRotator();
+//		startThreePointRotator();
 	}
 
 	void Update () {

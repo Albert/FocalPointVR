@@ -9,6 +9,7 @@ public class FocalPointManager : MonoBehaviour {
 	private FocalPointMaker[] makers;
 	private List<GameObject> focalPoints;
 	private bool anyPointChangedThisFrame = false;
+	private Vector3[] oldPointsForRotation = new Vector3[2];
 
 	void Start () {
 		subjectHandlerSettings = subject.GetComponent<FocalPointHandler> ();
@@ -94,8 +95,14 @@ public class FocalPointManager : MonoBehaviour {
 
 	void applyRotation() {
 		if (focalPoints.Count == 2 && !subjectHandlerSettings.lockRotation) {
-			Quaternion currentRotation = Quaternion.LookRotation (focalPoints [0].transform.position - focalPoints [1].transform.position);
-			transform.rotation = currentRotation;
+			Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
+			Vector3 direction2 = focalPoints [0].transform.position - focalPoints [1].transform.position;
+			Vector3 cross = Vector3.Cross (direction1, direction2);
+			float amountToRot = Vector3.Angle (direction1, direction2);
+			transform.RotateAround(transform.position, cross, amountToRot);
+
+			oldPointsForRotation [0] = focalPoints [0].transform.position;
+			oldPointsForRotation [1] = focalPoints [1].transform.position;
 		} else if (focalPoints.Count == 3 && !subjectHandlerSettings.lockRotation) {
 			// TODO Talk to a proper comp sci person about a better way to do this...
 			Vector3 directionToLook = focalPoints [1].transform.position - focalPoints [0].transform.position;
