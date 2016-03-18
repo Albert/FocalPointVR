@@ -1,11 +1,19 @@
+key:
+[x] done
+[-] skip for now
+
 [ ] Manipulator should be able to (or, Unity dev should feel enabled to create experiences where end users are able to)
 [x]   WORK WITH POINTS OF TRACTION
 [x]     assert physical 3d points
 [x]     activate points
 [x]     see the focal points
+[ ]   MOVE CLAW
+[ ]     telescope the claw in and out  (3)
+[ ]     deploy and retract laser claw  (5)
 [ ]   SELECT THINGS
-[ ]     select objects
-[ ]     change scope of selection
+[ ]     select objects  (5)
+[ ]     easily identify which element is selected  (3)
+[-]     change scope of selection
 [x]   MANIPULATE
 [x]     translate by moving focal points
 [x]     scale by moving 2 or more points
@@ -14,17 +22,20 @@
 
 [ ] Unity Dev should be able to
 [ ]   LEARN
-[ ]     see a demo of the tech to understand how it works
-[ ]     read tips on affordance and training the users
-[ ]   CUSTOMIZATION
+[ ]     see a demo of the tech to understand how it works  (8)
+[-]     read tips on affordance and training the users
+[ ]   IMPLEMENT
+[ ]     use only 1 component on the SteamVR object to instantiate everything  (5)
+[ ]     replace each component with their own flavor of the component  (3)
+[ ]   CUSTOMIZE
 [x]     identify if an object should be freely movable in all dims or not
-[ ]     customize how focal points get placed
-[ ]     customize how focal points look
-[ ]     customize how lasers look
+[-]     customize how focal points get placed
+[-]     customize how focal points look
+[-]     customize how lasers look
 [ ]   THINK META
-[ ]     learn about licensing
-[ ]     get alerts for updates (don't know how Unity handles this)
+[ ]     learn about licensing  (2)
+[ ]     get alerts for updates  (2)
 
 [ ] Library Dev should be able to
-[ ]   send / retrieve / review PRs
-[ ]   push updates
+[ ]   send / retrieve / review PRs  (2)
+[ ]   push updates  (2)

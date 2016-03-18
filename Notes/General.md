@@ -12,7 +12,14 @@ There are lots of things that, for the first pass, I'm going to punt on playing 
 
 Handles to constrain rotation / scaling / movement against only one dimension
 Different layers of Focal Points for different controllers (so that each hand can manipulate it's own object)
-Further research into distinguishing between objects and environments... or discovering patterns that properly account for both
+Distinguishing between objects and environments... or discovering patterns that properly account for both
 Raycasting not on the object itself, but a plane normal to the raycast hitpoint
   (if the controller moves too fast within a frame and / of if the object is really small, it's easy for the raycast to not hit the object)
 Allowing control on a per user basis
+"Displaced Claw"
+  when you grip, the difference of your controller and the claw gets cemented, so if you rotate your hand, the claw only rotates, and if you displace your hand, the claw displaces in a mirrored manner
+menu (swipe right to show menu) that has checkboxes:
+  [x] translate
+  [x] rotate
+  [x] scale
+When the focal point is on the ground, pointing off into the horizon has undesirable results.  Would be nice if there were some way to map a sphere around the user onto that surface so that they can move around freely without flying way far off.

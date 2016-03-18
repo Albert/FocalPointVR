@@ -1,44 +1,3 @@
--------------
--- Scripts --
--------------
-
-UNATTACHED
-  Class Focal Point.cs
-    vec3 position
-    bool isActive
-    vec3 origin (can be null)
-
-TO OBJECTS THAT ARE HANDLEABLE
-  Focal Point Handler.cs
-    public:
-      bool lock translation
-      bool lock rotation
-      bool lock scale
-      bool keeps translation inertia on release
-      bool keeps rotation inertia on release
-      bool keeps scale inertia on release
-
-TO CONTROLLERS
-  Focal Point Subject Selector.cs
-    public:
-      subject (reports it to interaction layer)
-
-  Focal Point Maker.cs
-    public:
-      List<FocalPoint> focalPoints
-
-TO FOCAL POINT INTERACTION LAYER
-  Focal Point Interaction Manager.cs
-    public List<GameObject> controllers
-    public GameObject FocalPointTemplate (can be left empty to not render)
-
-TO FOCAL POINT TEMPLATE (referenced in focal point maker)
-  Focal Point Renderer.cs
-    public color when hover
-    public color when active
-    public Sprite RaySprite (can be left empty to not render sprite) (optional)
-
-
 ---------------
 -- Game Objs --
 ---------------
@@ -46,33 +5,67 @@ TO FOCAL POINT TEMPLATE (referenced in focal point maker)
 Game Scene
   typical heirarchy
 
-Camera Rig (Vive-specific)
+SteamVR Rig
   Controller Left
-    FocalPoint 1
-    FocalPoint 2  // sometimes focal points have lasers, sometimes they don't
-    Laser 2
-      sprite 1
-      sprite 2
-    FocalPoint 3
-    Laser 3
-      sprite 1
-      sprite 2
+    Claw
+      Focal Point 1
+      Focal Point 2
+      Focal Point 3
+    Telescope
+    Laser
 
   Controller Right
-    FocalPoint
+    Claw
+      Focal Point 1
+      Focal Point 2
+      Focal Point 3
+    Telescope
     Laser
-      sprite 1
-      sprite 2
-    FocalPoint
-    Laser
-      sprite 1
-      sprite 2
-
   Camera
 
-Interaction Layer
-  Game Subject (whenever being interacted with)
+  Interaction Layer
+    Game Subject (whenever being interacted with)
 
 // down below in prefabs
 Prefabs
-  Focal Point Template
+  Focal Point
+  Claw
+
+-------------
+-- Scripts --
+-------------
+
+TO STEAMVR RIG
+  ClawVR SteamVR Scaffolding
+    Focal Point Prefab
+    Claw Prefab
+    [x] can select any object
+
+TO CLAW PREFAB
+  ClawVR Attachment Renderer
+    Telescope Sprite
+    Laser Sprite
+
+TO FOCAL POINT PREFAB
+  ClawVR Focal Point Renderer
+    public color when hover
+    public color when active
+
+TO CONTROLLERS
+  ClawVR Claw Controller
+  ClawVR Selector
+
+TO INTERACTION LAYER
+  ClawVR Interaction Manager.cs
+    public List<GameObject> controllers
+    public GameObject FocalPointTemplate (can be left empty to not render)
+
+TO OBJECTS THAT ARE HANDLEABLE (optional)
+  ClawVR Manipulation Handler.cs
+    public:
+      bool lock translation
+      bool lock rotation
+      bool lock scale
+      bool keeps translation inertia on release
+      bool keeps rotation inertia on release
+      bool keeps scale inertia on release
