@@ -37,22 +37,22 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 	}
 
 	void moveClaw() {
-        if (SteamVR_Controller.Input(controllerIndex).GetTouchDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
-            downLocation = SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-			telescopeDistanceOnTouch = clawController.GetScopeDistance();
-			telescopeInterrupted = false;
-		}
-		if (SteamVR_Controller.Input(controllerIndex).GetTouch(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
-            Vector2 delta = SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0) - downLocation;
-			if (Mathf.Abs(delta.y) > 0.2 && !telescopeInterrupted) {
-				clawController.TelescopeAbsolutely(telescopeDistanceOnTouch + delta.y * 0.6f);
-			}
-		}
+//        if (SteamVR_Controller.Input(controllerIndex).GetTouchDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
+//            downLocation = SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+//			telescopeDistanceOnTouch = clawController.GetScopeDistance();
+//			telescopeInterrupted = false;
+//		}
+//		if (SteamVR_Controller.Input(controllerIndex).GetTouch(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
+//            Vector2 delta = SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0) - downLocation;
+//			if (Mathf.Abs(delta.y) > 0.2 && !telescopeInterrupted) {
+//				clawController.TelescopeAbsolutely(telescopeDistanceOnTouch + delta.y * 0.6f);
+//			}
+//		}
+//		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
+//            if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y > 0) {
 //		For this offline code to work, the above two if blocks must also be commented out because they throw blocking
-//		if (true == true) {
-//			if (Input.GetKeyDown(KeyCode.UpArrow)) {
-		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
-            if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y > 0) {
+		if (true == true) {
+			if (Input.GetKeyDown(KeyCode.UpArrow)) {
 				clawController.DeployLaser ();
 				telescopeInterrupted = true;
             } else if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y < -0) {
