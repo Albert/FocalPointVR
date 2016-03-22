@@ -14,19 +14,15 @@ public class ClawVR_HandController : ClawVR_GrasperController {
 	}
 
 	public override void CloseClaw() {
-		if (!isClosed) {
+		if (!isClosed && !laserMode) {
 			displayHandSprite (1);
 		}
 		base.CloseClaw ();
 	}
 
 	public override void OpenClaw() {
-		if (isClosed) {
-			if (laserMode) {
-				displayHandSprite (2);
-			} else {
-				displayHandSprite (0);
-			}
+		if (isClosed && !laserMode) {
+			displayHandSprite (0);
 		}
 		base.OpenClaw ();
 	}

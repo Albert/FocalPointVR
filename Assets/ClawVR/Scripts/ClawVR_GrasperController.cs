@@ -62,6 +62,7 @@ public class ClawVR_GrasperController : MonoBehaviour {
 				}
 			}
 			samePointsAsLastFrame = false;
+			pathSpriteContainer.transform.localScale = new Vector3 (1.0f, 6.0f, 6.0f);
 
 			isClosed = true;
 		}
@@ -76,6 +77,7 @@ public class ClawVR_GrasperController : MonoBehaviour {
 				}
 			}
 			samePointsAsLastFrame = false;
+			pathSpriteContainer.transform.localScale = Vector3.one;
 
 			isClosed = false;
 		}
