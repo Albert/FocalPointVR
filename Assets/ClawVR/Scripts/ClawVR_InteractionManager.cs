@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class ClawVR_InteractionManager : MonoBehaviour {
     public bool canSelectAnyObject = true;
-    private GameObject subject;
-	private Transform subjectPreviousParent;
-	private List<ClawVR_ClawController> clawControllers = new List<ClawVR_ClawController>();
+	public GameObject subject { set; get; }
+    private Transform subjectPreviousParent;
+    private List<ClawVR_ClawController> clawControllers = new List<ClawVR_ClawController>();
 	private List<GameObject> focalPoints = new List<GameObject>();
 	private bool anyPointChangedThisFrame;
 	private Vector3[] oldPointsForRotation = new Vector3[2];
@@ -23,19 +23,21 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 
     void LateUpdate() {
         updatePointsIfNecessary();
-		applyTranslation ();
+        if (anyPointChangedThisFrame && subject.transform.parent == transform) {
+            // kick it out for one frame
+            subject.transform.SetParent(subjectPreviousParent);
+        }
+        applyTranslation ();
 		applyScale ();
 		applyRotation ();
-		if (anyPointChangedThisFrame) {
-			if (subject.transform.parent != transform) {
-				subjectPreviousParent = subject.transform.parent;
-				subject.transform.SetParent (transform);
-			}
-			if (focalPoints.Count == 0) {
-				subject.transform.SetParent (subjectPreviousParent);
-			}
-		}
-		runHighlighter ();
+        if (anyPointChangedThisFrame) {
+            subjectPreviousParent = subject.transform.parent;
+            subject.transform.SetParent(transform);
+            if (focalPoints.Count == 0) {
+                subject.transform.SetParent(subjectPreviousParent);
+            }
+        }
+        runHighlighter ();
     }
 
     void updatePointsIfNecessary() {
@@ -109,7 +111,7 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 			Vector3 direction2 = focalPoints [0].transform.position - focalPoints [1].transform.position;
 			Vector3 cross = Vector3.Cross (direction1, direction2);
 			float amountToRot = Vector3.Angle (direction1, direction2);
-			transform.RotateAround(transform.position, cross, amountToRot);
+			transform.RotateAround(transform.position, cross.normalized, amountToRot);
 
 			oldPointsForRotation [0] = focalPoints [0].transform.position;
 			oldPointsForRotation [1] = focalPoints [1].transform.position;
@@ -148,5 +150,6 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 
 	public void registerClaw(ClawVR_ClawController c) {
 		clawControllers.Add (c);
+        c.ixdManager = this;
 	}
 }

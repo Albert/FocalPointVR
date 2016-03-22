@@ -15,7 +15,7 @@ public class ClawVR_SteamVRAdapter : MonoBehaviour {
 			ClawVR_ViveControllerAdapter adapter = controller.AddComponent<ClawVR_ViveControllerAdapter>();
 			adapter.ixdManager = ixdManager;
 
-			GameObject newClaw = Instantiate(clawPrefab, new Vector3(0, 0, 0), Quaternion.Euler(new Vector3(180, 0, 0))) as GameObject;
+			GameObject newClaw = Instantiate(clawPrefab, new Vector3(0, 0, 0), Quaternion.Euler(new Vector3(0, 0, 0))) as GameObject;
 			newClaw.transform.parent = controller.transform;
 		}
 	}
