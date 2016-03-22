@@ -6,7 +6,7 @@ public class ClawVR_InteractionManager : MonoBehaviour {
     public bool canSelectAnyObject = true;
 	public GameObject subject { set; get; }
     private Transform subjectPreviousParent;
-    private List<ClawVR_ClawController> clawControllers = new List<ClawVR_ClawController>();
+	private List<ClawVR_GrasperController> clawControllers = new List<ClawVR_GrasperController>();
 	private List<GameObject> focalPoints = new List<GameObject>();
 	private bool anyPointChangedThisFrame;
 	private Vector3[] oldPointsForRotation = new Vector3[2];
@@ -42,7 +42,7 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 
     void updatePointsIfNecessary() {
 		anyPointChangedThisFrame = false;
-        foreach (ClawVR_ClawController clawController in clawControllers) {
+        foreach (ClawVR_GrasperController clawController in clawControllers) {
 			if (clawController.CheckIfPointsHaveUpdated()) {
 				anyPointChangedThisFrame = true;
 				updatePoints ();
@@ -54,12 +54,12 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	void updatePoints() {
 		focalPoints.Clear();
 		int controllersThatAreClosed = 0;
-		foreach (ClawVR_ClawController clawController in clawControllers) {
+		foreach (ClawVR_GrasperController clawController in clawControllers) {
 			if (clawController.isClosed) {
 				controllersThatAreClosed++;
 			}
 		}
-		foreach (ClawVR_ClawController clawController in clawControllers) {
+		foreach (ClawVR_GrasperController clawController in clawControllers) {
 			if (controllersThatAreClosed == 1) {
 				foreach (Transform child in clawController.gameObject.transform) {
 					if (child.name == "ClawFocalPoint") {
@@ -148,7 +148,7 @@ public class ClawVR_InteractionManager : MonoBehaviour {
         subject = newSubject;
     }
 
-	public void registerClaw(ClawVR_ClawController c) {
+	public void registerClaw(ClawVR_GrasperController c) {
 		clawControllers.Add (c);
         c.ixdManager = this;
 	}

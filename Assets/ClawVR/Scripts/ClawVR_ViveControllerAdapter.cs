@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class ClawVR_ViveControllerAdapter : MonoBehaviour {
-	private ClawVR_ClawController clawController;
+	private ClawVR_GrasperController clawController;
 	private int controllerIndex;
 
 	private Vector2 downLocation;
@@ -13,7 +13,7 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
     private GameObject hoveredSubject;
 
     void Start () {
-        clawController = GetComponentInChildren<ClawVR_ClawController>();
+        clawController = GetComponentInChildren<ClawVR_GrasperController>();
 		ixdManager.registerClaw (clawController);
         // TODO: when this instanciates, left should be indexed to 14, right to 15, and make a note of it
         controllerIndex = GetComponent<SteamVR_TrackedObject>().index.GetHashCode();
@@ -48,6 +48,9 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 				clawController.TelescopeAbsolutely(telescopeDistanceOnTouch + delta.y * 0.6f);
 			}
 		}
+//		For this offline code to work, the above two if blocks must also be commented out because they throw blocking
+//		if (true == true) {
+//			if (Input.GetKeyDown(KeyCode.UpArrow)) {
 		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
             if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y > 0) {
 				clawController.DeployLaser ();
