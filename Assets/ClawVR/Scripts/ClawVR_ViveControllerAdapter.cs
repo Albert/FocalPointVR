@@ -10,7 +10,7 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 	private bool telescopeInterrupted;
 
 	public ClawVR_InteractionManager ixdManager {get; set;}
-    private GameObject hoveredSubject;
+	private GameObject hoveredSubject;
 
     void Start () {
         clawController = GetComponentInChildren<ClawVR_GrasperController>();
@@ -55,7 +55,8 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 			if (Input.GetKeyDown(KeyCode.UpArrow)) {
 				clawController.DeployLaser ();
 				telescopeInterrupted = true;
-            } else if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y < -0) {
+//            } else if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y < -0) {
+			} else if (Input.GetKeyDown(KeyCode.DownArrow)) {
 				clawController.TelescopeAbsolutely(0.0f);
 				telescopeInterrupted = true;
 			}
@@ -64,15 +65,23 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 
 	void findSelection() {
 		Ray controllerRay = new Ray(transform.position, transform.forward);
-		RaycastHit hit;
-		if (Physics.Raycast(controllerRay, out hit)) {
-			if (!hoveredSubject || !hoveredSubject.Equals(hit.collider.gameObject)) {
-				hoveredSubject = hit.collider.gameObject;
+		RaycastHit[] hits;
+		hits = Physics.RaycastAll (controllerRay);
+		float closestDistance = 999999999.9f;
+		hoveredSubject = null;
+		foreach (RaycastHit hit in hits) {
+			// TODO: there has to be a better way...
+			if (hit.distance < closestDistance) {
+				ClawVR_ManipulationHandler manipHandler = hit.collider.gameObject.GetComponent<ClawVR_ManipulationHandler> ();
+				if ((manipHandler != null && manipHandler.isSelectable) || (ixdManager.canSelectAnyObject && manipHandler == null)) {
+					closestDistance = hit.distance;
+					hoveredSubject = hit.collider.gameObject;
+				}
 			}
-		} else {
-			hoveredSubject = null;
 		}
-		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger)) {
+
+		//if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger)) {
+		if (Input.GetKeyDown(KeyCode.S)) {
 			ixdManager.changeSubject(hoveredSubject);
 		}
 	}

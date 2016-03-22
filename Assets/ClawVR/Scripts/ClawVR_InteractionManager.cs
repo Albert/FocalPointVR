@@ -11,6 +11,7 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	private bool anyPointChangedThisFrame;
 	private Vector3[] oldPointsForRotation = new Vector3[2];
 	private Light selectionHighlighter;
+	private ClawVR_ManipulationHandler subjectManipHandler;
 	public GameObject laserCollider { get; set; }
 
 	void Start () {
@@ -20,10 +21,10 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	}
 
     void Update () {
-        // a nice-to-have would be when canSelectAnyObject gets updated, repopulates throughout
     }
 
     void LateUpdate() {
+		subjectManipHandler = subject.GetComponent<ClawVR_ManipulationHandler> ();
         updatePointsIfNecessary();
         if (anyPointChangedThisFrame && subject.transform.parent == transform) {
             // kick it out for one frame
@@ -76,10 +77,11 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	}
 
 	void applyTranslation () {
+		if (subjectManipHandler != null && subjectManipHandler.lockTranslation) {
+			transform.position = subject.transform.position;
+			return;
+		}
 		if (focalPoints.Count > 0) {
-//			if (subjectHandlerSettings.lockTranslation) {
-//				transform.position = subject.transform.position;
-//			} else {
 				Vector3 averagePoint = new Vector3();
 				foreach (GameObject point in focalPoints) {
 					averagePoint += point.transform.position;
@@ -91,7 +93,9 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	}
 
 	void applyScale () {
-//		if (focalPoints.Count > 1 && !subjectHandlerSettings.lockScale) {
+		if (subjectManipHandler != null && subjectManipHandler.lockScale) {
+			return;
+		}
 		if (focalPoints.Count > 1) {
 			float averageDistance = 0;
 			foreach (GameObject pointA in focalPoints) {
@@ -107,7 +111,9 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	}
 
 	void applyRotation () {
-//		if (focalPoints.Count == 2 && !subjectHandlerSettings.lockRotation) {
+		if (subjectManipHandler != null && subjectManipHandler.lockRotation) {
+			return;
+		}
 		if (focalPoints.Count == 2) {
 			Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
 			Vector3 direction2 = focalPoints [0].transform.position - focalPoints [1].transform.position;
@@ -117,7 +123,6 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 
 			oldPointsForRotation [0] = focalPoints [0].transform.position;
 			oldPointsForRotation [1] = focalPoints [1].transform.position;
-//		} else if (focalPoints.Count == 3 && !subjectHandlerSettings.lockRotation) {
 		} else if (focalPoints.Count == 3) {
 			// TODO Talk to a proper comp sci person about a better way to do this...
 			Vector3 directionToLook = focalPoints [1].transform.position - focalPoints [0].transform.position;
@@ -128,7 +133,6 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 			float sign = Vector3.Cross(transform.InverseTransformDirection(transform.right), projectedReference).z < 0 ? -1 : 1;
 			levelingAngle *= sign;
 			transform.Rotate (transform.InverseTransformDirection(transform.forward), levelingAngle);
-//		} else if (focalPoints.Count > 3 && !subjectHandlerSettings.lockRotation) {
 		} else if (focalPoints.Count > 3) {
 			// TODO I have no idea how to solve for this
 		}
