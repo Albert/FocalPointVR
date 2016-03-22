@@ -30,8 +30,9 @@ public class ClawVR_GrasperController : MonoBehaviour {
 		if (laserMode) {
 			Ray laserRay = new Ray(transform.parent.position, transform.parent.transform.forward);
 			RaycastHit hit;
+			GameObject l = ixdManager.laserCollider;
 			if (isClosed) {
-				Collider c = ixdManager.subject.GetComponent<Collider> ();
+				Collider c = l.GetComponent<Collider> ();
 				if (c.Raycast (laserRay, out hit, 99999)) {
 					transform.position = hit.point - transform.TransformVector(pincerDifference);
 				} else {
@@ -40,6 +41,8 @@ public class ClawVR_GrasperController : MonoBehaviour {
 			} else {
 				if (Physics.Raycast(laserRay, out hit)) {
 					transform.position = hit.point - transform.TransformVector(pincerDifference);
+					l.transform.position = hit.point;
+					l.transform.up = hit.normal;
 				} else {
 					transform.localPosition = Vector3.zero;
 				}
@@ -53,6 +56,7 @@ public class ClawVR_GrasperController : MonoBehaviour {
 				GameObject focalPoint = new GameObject("ClawFocalPoint");
 				focalPoint.transform.localPosition = pincerDifference;
 				focalPoint.transform.SetParent(transform, false);
+				ixdManager.laserCollider.SetActive (true);
 			} else {
 				Vector3[] points = { Vector3.zero, Vector3.forward, Vector3.up };
 				foreach (Vector3 point in points) {

@@ -11,10 +11,12 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	private bool anyPointChangedThisFrame;
 	private Vector3[] oldPointsForRotation = new Vector3[2];
 	private Light selectionHighlighter;
+	public GameObject laserCollider { get; set; }
 
 	void Start () {
-		subject = GameObject.Find ("Cube");
+		laserCollider = transform.Find ("Laser Collider").gameObject;
 		selectionHighlighter = FindObjectOfType<Light> ();
+		this.changeSubject(GameObject.Find("Cube"));
 	}
 
     void Update () {
@@ -146,6 +148,11 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 
     public void changeSubject(GameObject newSubject) {
         subject = newSubject;
+		if (newSubject == null) {
+			laserCollider.transform.SetParent (null);
+		} else {
+			laserCollider.transform.SetParent (subject.transform);
+		}
     }
 
 	public void registerClaw(ClawVR_GrasperController c) {
