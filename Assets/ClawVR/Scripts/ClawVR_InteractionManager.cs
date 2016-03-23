@@ -159,9 +159,11 @@ public class ClawVR_InteractionManager : MonoBehaviour {
         subject = newSubject;
 		if (newSubject == null) {
 			laserCollider.transform.SetParent (null);
-		} else {
+            selectionHighlighter.gameObject.SetActive(false);
+        } else {
 			laserCollider.transform.SetParent (subject.transform);
-		}
+            selectionHighlighter.gameObject.SetActive(true);
+        }
     }
 
 	public void registerClaw(ClawVR_HandController c) {
