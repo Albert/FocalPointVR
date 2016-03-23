@@ -2,48 +2,205 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ClawVR_HandController : ClawVR_GrasperController {
-	private GameObject[] handSprites = new GameObject[3];
+public class ClawVR_HandController : MonoBehaviour {
+    private Vector3 pincerDifference = new Vector3(0, 0, 0.09f);
 
-	public override void Start () {
-		handSprites [0] = transform.Find ("open-hand").gameObject;
-		handSprites [1] = transform.Find ("closed-hand").gameObject;
-		handSprites [2] = transform.Find ("pointer").gameObject;
-		pincerDifference = new Vector3 (0, 0, -0.09f);
-		base.Start ();
-	}
+    public bool isClosed { get; set; }
+    private bool laserMode;
+    private bool samePointsAsLastFrame = true;
 
-	public override void CloseClaw() {
-		if (!isClosed && !laserMode) {
-			displayHandSprite (1);
-		}
-		base.CloseClaw ();
-	}
+    public GameObject pathSpritePrefab;
+    private GameObject pathSpriteContainer;
+    private GameObject[] pathSpriteComponents;
+    public ClawVR_InteractionManager ixdManager { get; set; }
 
-	public override void OpenClaw() {
-		if (isClosed && !laserMode) {
-			displayHandSprite (0);
-		}
-		base.OpenClaw ();
-	}
+    private GameObject[] handSprites = new GameObject[3];
 
-	public override void DeployTelescope() {
-		if (isClosed) {
-			displayHandSprite (1);
-		} else {
-			displayHandSprite (0);
-		}
-		base.DeployTelescope ();
-	}
+    public void Start() {
+        handSprites[0] = transform.Find("open").gameObject;
+        handSprites[1] = transform.Find("closed").gameObject;
+        handSprites[2] = transform.Find("pointer").gameObject;
+        if (transform.parent.gameObject.name == "Controller (left)") {
+            foreach(GameObject handSprite in handSprites) {
+                handSprite.transform.Rotate(Vector3.up, 180);
+            }
+        }
+        displayHandSprite(0);
+        pathSpriteContainer = Instantiate(pathSpritePrefab, new Vector3(0, 0, 0), Quaternion.Euler(new Vector3(0, -90, 0))) as GameObject;
+        pathSpriteContainer.transform.parent = transform.parent;
+        // TODO: there's got to be a better way to do this...
+        pathSpriteComponents = new GameObject[] {
+            transform.parent.Find("Path Sprite(Clone)/Laser1").gameObject,
+            transform.parent.Find("Path Sprite(Clone)/Laser2").gameObject,
+            transform.parent.Find("Path Sprite(Clone)/Telescope1").gameObject,
+            transform.parent.Find("Path Sprite(Clone)/Telescope2").gameObject
+        };
+    }
 
-	public override void DeployLaser() {
-		displayHandSprite (2);
-		base.DeployLaser ();
-	}
+    void Update() {
+        showCorrectSprites();
+        if (laserMode) {
+            Ray laserRay = new Ray(transform.parent.position, transform.parent.transform.forward);
+            bool otherHandIsClosed = (otherHandController() != null && otherHandController().isClosed);
+            if (isClosed) {
+                if (!otherHandIsClosed) {
+                    setLaserCollider(laserRay);
+                }
+                positionClawOnLaserCollider(laserRay);
+            } else {
+                if (otherHandIsClosed) {
+                    positionClawOnLaserCollider(laserRay);
+                } else {
+                    setLaserCollider(laserRay);
+                }
+                pathSpriteContainer.transform.localScale = new Vector3(99999, 1.0f, 1.0f);
+            }
+        }
+    }
 
-	void displayHandSprite(int index) {
-		for (int i = 0; i < handSprites.Length; i++) {
-			handSprites [i].SetActive (index == i);
-		}
-	}
+    void showCorrectSprites() {
+        if (laserMode) {
+            displayHandSprite(2);
+            if (isClosed) {
+                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
+            } else {
+                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1.0f, 1.0f);
+            }
+        } else {
+            if (isClosed) {
+                displayHandSprite(1);
+            } else {
+                displayHandSprite(0);
+            }
+        }
+    }
+
+    private void positionClawOnLaserCollider(Ray laserRay) {
+        RaycastHit hit;
+        GameObject l = ixdManager.laserCollider;
+        Collider c = l.GetComponent<Collider>();
+        if (c.Raycast(laserRay, out hit, 99999)) {
+            transform.position = hit.point - transform.TransformVector(pincerDifference);
+        }
+    }
+
+    private void setLaserCollider(Ray laserRay) {
+        GameObject l = ixdManager.laserCollider;
+        RaycastHit hit;
+        if (ixdManager.subject != null) {
+            Collider s = ixdManager.subject.GetComponent<Collider>();
+            if (s.Raycast(laserRay, out hit, 99999)) {
+                transform.position = hit.point - transform.TransformVector(pincerDifference);
+                l.transform.position = hit.point;
+                l.transform.up = hit.normal;
+                l.SetActive(true);
+            } else {
+                l.SetActive(false);
+                transform.localPosition = Vector3.zero;
+            }
+        } else {
+            transform.localPosition = Vector3.zero;
+        }
+    }
+
+    public void CloseClaw() {
+        if (!isClosed) {
+            if (laserMode) {
+                if (transform.localPosition != Vector3.zero) {
+                    GameObject focalPoint = new GameObject("ClawFocalPoint");
+                    focalPoint.transform.localPosition = pincerDifference;
+                    focalPoint.transform.SetParent(transform, false);
+                }
+            } else {
+                Vector3[] points = { Vector3.zero, Vector3.forward, Vector3.up };
+                foreach (Vector3 point in points) {
+                    GameObject focalPoint = new GameObject("ClawFocalPoint");
+                    focalPoint.transform.localPosition = pincerDifference + point;
+                    focalPoint.transform.SetParent(transform, false);
+                }
+            }
+            samePointsAsLastFrame = false;
+            pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
+
+            isClosed = true;
+        }
+    }
+
+    public void OpenClaw() {
+        // TODO: consider making it lerp out
+        if (isClosed) {
+            foreach (Transform child in transform) {
+                if (child.name == "ClawFocalPoint") {
+                    Destroy(child.gameObject);
+                }
+            }
+            samePointsAsLastFrame = false;
+            pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1, 1);
+
+            isClosed = false;
+        }
+    }
+
+    public void DeployLaser() {
+        laserMode = true;
+        pathSpriteContainer.transform.localScale = new Vector3(9999.9f, 1, 1);
+        pathSpriteComponents[0].SetActive(true);
+        pathSpriteComponents[1].SetActive(true);
+        pathSpriteComponents[2].SetActive(false);
+        pathSpriteComponents[3].SetActive(false);
+    }
+
+    public void DeployTelescope() {
+        laserMode = false;
+        if (isClosed) {
+            pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
+        } else {
+            pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1, 1);
+        }
+        pathSpriteComponents[0].SetActive(false);
+        pathSpriteComponents[1].SetActive(false);
+        pathSpriteComponents[2].SetActive(true);
+        pathSpriteComponents[3].SetActive(true);
+    }
+
+    public void TelescopeRelatively(float amount) {
+        transform.localPosition = transform.localPosition + new Vector3(0, 0, amount);
+        if (transform.localPosition.z < 0) {
+            transform.localPosition = Vector3.zero;
+        }
+        DeployTelescope();
+    }
+
+    public void TelescopeAbsolutely(float amount) {
+        transform.localPosition = new Vector3(0, 0, amount);
+        if (transform.localPosition.z < 0) {
+            transform.localPosition = Vector3.zero;
+        }
+        DeployTelescope();
+    }
+
+    public float GetScopeDistance() {
+        return transform.localPosition.z;
+    }
+
+    public bool CheckIfPointsHaveUpdated() {
+        bool returnValue = !samePointsAsLastFrame;
+        samePointsAsLastFrame = true;
+        return returnValue;
+    }
+
+    void displayHandSprite(int index) {
+        for (int i = 0; i < handSprites.Length; i++) {
+            handSprites[i].SetActive(index == i);
+        }
+    }
+
+    public ClawVR_HandController otherHandController() {
+        foreach (ClawVR_HandController controller in ixdManager.clawControllers) {
+            if (this.GetInstanceID() != controller.GetInstanceID()) {
+                return controller;
+            }
+        }
+        return null;
+    }
 }

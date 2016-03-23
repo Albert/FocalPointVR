@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class ClawVR_ViveControllerAdapter : MonoBehaviour {
-	private ClawVR_GrasperController clawController;
+	private ClawVR_HandController clawController;
 	private int controllerIndex;
 
 	private Vector2 downLocation;
@@ -13,7 +13,7 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 	private GameObject hoveredSubject;
 
     void Start () {
-        clawController = GetComponentInChildren<ClawVR_GrasperController>();
+        clawController = GetComponentInChildren<ClawVR_HandController>();
 		ixdManager.registerClaw (clawController);
         // TODO: when this instanciates, left should be indexed to 14, right to 15, and make a note of it
         controllerIndex = GetComponent<SteamVR_TrackedObject>().index.GetHashCode();
@@ -26,38 +26,47 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
     }
 		
 	void openCloseClaw() {
-		if (Input.GetKeyDown(KeyCode.Space)) {
-//		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Grip)) {
+//		if (Input.GetKeyDown(KeyCode.Space)) {
+		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Grip)) {
 			clawController.CloseClaw();
 		}
-		if (Input.GetKeyUp(KeyCode.Space)) {
-//		if (SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Grip)) {
+//		if (Input.GetKeyUp(KeyCode.Space)) {
+		if (SteamVR_Controller.Input(controllerIndex).GetPressUp(SteamVR_Controller.ButtonMask.Grip)) {
 			clawController.OpenClaw();
 		}
 	}
 
 	void moveClaw() {
-//        if (SteamVR_Controller.Input(controllerIndex).GetTouchDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
-//            downLocation = SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-//			telescopeDistanceOnTouch = clawController.GetScopeDistance();
-//			telescopeInterrupted = false;
-//		}
-//		if (SteamVR_Controller.Input(controllerIndex).GetTouch(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
-//            Vector2 delta = SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0) - downLocation;
-//			if (Mathf.Abs(delta.y) > 0.2 && !telescopeInterrupted) {
-//				clawController.TelescopeAbsolutely(telescopeDistanceOnTouch + delta.y * 0.6f);
-//			}
-//		}
-//		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
-//            if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y > 0) {
+        if (SteamVR_Controller.Input(controllerIndex).GetTouchDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
+            downLocation = SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+			telescopeDistanceOnTouch = clawController.GetScopeDistance();
+			telescopeInterrupted = false;
+		}
+		if (SteamVR_Controller.Input(controllerIndex).GetTouch(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
+            Vector2 delta = SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0) - downLocation;
+			if (Mathf.Abs(delta.y) > 0.2 && !telescopeInterrupted) {
+                foreach (ClawVR_HandController controller in ixdManager.clawControllers) {
+                    controller.TelescopeAbsolutely(telescopeDistanceOnTouch + delta.y * 0.6f);
+                }
+//                clawController.TelescopeAbsolutely(telescopeDistanceOnTouch + delta.y * 0.6f);
+			}
+		}
+		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(Valve.VR.EVRButtonId.k_EButton_Axis0)) {
+            if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y > 0) {
 //		For this offline code to work, the above two if blocks must also be commented out because they throw blocking
-		if (true == true) {
-			if (Input.GetKeyDown(KeyCode.UpArrow)) {
-				clawController.DeployLaser ();
+//		if (true == true) {
+//			if (Input.GetKeyDown(KeyCode.UpArrow)) {
+                foreach (ClawVR_HandController controller in ixdManager.clawControllers) {
+                    controller.DeployLaser();
+                }
+//				clawController.DeployLaser ();
 				telescopeInterrupted = true;
-//            } else if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y < -0) {
-			} else if (Input.GetKeyDown(KeyCode.DownArrow)) {
-				clawController.TelescopeAbsolutely(0.0f);
+            } else if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0).y < -0) {
+//			} else if (Input.GetKeyDown(KeyCode.DownArrow)) {
+                foreach (ClawVR_HandController controller in ixdManager.clawControllers) {
+                    controller.TelescopeAbsolutely(0.0f);
+                }
+//				clawController.TelescopeAbsolutely(0.0f);
 				telescopeInterrupted = true;
 			}
 		}
@@ -74,14 +83,16 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 			if (hit.distance < closestDistance) {
 				ClawVR_ManipulationHandler manipHandler = hit.collider.gameObject.GetComponent<ClawVR_ManipulationHandler> ();
 				if ((manipHandler != null && manipHandler.isSelectable) || (ixdManager.canSelectAnyObject && manipHandler == null)) {
-					closestDistance = hit.distance;
-					hoveredSubject = hit.collider.gameObject;
-				}
+                    if (hit.collider.gameObject.name != "Laser Collider") {
+                        closestDistance = hit.distance;
+                        hoveredSubject = hit.collider.gameObject;
+                    }
+                }
 			}
 		}
 
-		//if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger)) {
-		if (Input.GetKeyDown(KeyCode.S)) {
+		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger)) {
+//		if (Input.GetKeyDown(KeyCode.S)) {
 			ixdManager.changeSubject(hoveredSubject);
 		}
 	}
