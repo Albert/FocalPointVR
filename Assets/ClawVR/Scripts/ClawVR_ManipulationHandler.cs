@@ -8,8 +8,9 @@ public class ClawVR_ManipulationHandler : MonoBehaviour {
 	public bool lockScale;
     public bool translationInertiaOnRelease;
     public bool rotationInertiaOnRelease;
-    public bool scaleInertiaOnRelease;
     public float flickAnimationLength = 0.3f;
+    public float translationInertiaThreshold = 8f;
+    public float rotationInertiaThreshold = 5f;
 
     public Vector3 thisFramePosition { get; set; }
     public Quaternion thisFrameRotation { get; set; }
@@ -23,7 +24,7 @@ public class ClawVR_ManipulationHandler : MonoBehaviour {
     private Rigidbody rbody;
     private bool prevKinematicState;
 
-    private float timeOfRelease = 0;
+    private float timeOfRelease = -99999;
     private Vector3 translationInertiaVelocity;
     private Quaternion rotationInertiaDelta;
 
@@ -49,6 +50,7 @@ public class ClawVR_ManipulationHandler : MonoBehaviour {
     }
 
     public void capture() {
+        timeOfRelease = -99999;
         if (isPhysicsBased) {
             prevKinematicState = rbody.isKinematic;
             rbody.isKinematic = true;
@@ -71,10 +73,23 @@ public class ClawVR_ManipulationHandler : MonoBehaviour {
         } else {
             timeOfRelease = Time.time;
             if (translationInertiaOnRelease) {
-                translationInertiaVelocity = (transform.position - lastFramePosition) / Time.fixedDeltaTime;
+                Vector3 potentialVel = (transform.position - lastFramePosition) / Time.fixedDeltaTime;
+                if (potentialVel.magnitude > translationInertiaThreshold) {
+                    translationInertiaVelocity = potentialVel;
+                } else {
+                    translationInertiaVelocity = Vector3.zero;
+                }
             }
             if (rotationInertiaOnRelease) {
-                rotationInertiaDelta = Quaternion.Inverse(lastFrameRotation) * thisFrameRotation;
+                Quaternion potentialRot = Quaternion.Inverse(lastFrameRotation) * thisFrameRotation;
+                float potentialAngle;
+                Vector3 trashAngle;
+                potentialRot.ToAngleAxis(out potentialAngle, out trashAngle);
+                if (potentialAngle > rotationInertiaThreshold) {
+                    rotationInertiaDelta = Quaternion.Inverse(lastFrameRotation) * thisFrameRotation;
+                } else {
+                    rotationInertiaDelta = Quaternion.identity;
+                }
             }
         }
     }
