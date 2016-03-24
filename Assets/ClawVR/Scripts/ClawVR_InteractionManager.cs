@@ -25,27 +25,41 @@ public class ClawVR_InteractionManager : MonoBehaviour {
     }
 
     void LateUpdate() {
+        updatePointsIfNecessary();
         if (subject == null) {
             subjectManipHandler = null;
         } else {
             subjectManipHandler = subject.GetComponent<ClawVR_ManipulationHandler>();
         }
-        updatePointsIfNecessary();
+		if (anyPointChangedThisFrame && subject.transform.parent != transform && subjectManipHandler != null) {
+            subjectManipHandler.capture();
+		}
         if (anyPointChangedThisFrame && subject.transform.parent == transform) {
-            // kick it out for one frame
+            // kick out permanently for released objects, temporarily for if focal points just rearrange
             subject.transform.SetParent(subjectPreviousParent);
         }
         applyTranslation ();
 		applyScale ();
 		applyRotation ();
-        if (anyPointChangedThisFrame) {
-            subjectPreviousParent = subject.transform.parent;
-            subject.transform.SetParent(transform);
-            if (focalPoints.Count == 0) {
-                subject.transform.SetParent(subjectPreviousParent);
-            }
+		if (anyPointChangedThisFrame) {
+			if (focalPoints.Count == 0) {
+				if (subjectManipHandler != null) {
+					subjectManipHandler.release ();
+				}
+			} else {
+				subjectPreviousParent = subject.transform.parent;
+				subject.transform.SetParent (transform);
+			}
+		} else if (subjectManipHandler) {
+            subjectManipHandler.lastFramePosition = subjectManipHandler.thisFramePosition;
+            subjectManipHandler.lastFrameRotation = subjectManipHandler.thisFrameRotation;
+            subjectManipHandler.lastFrameScale    = subjectManipHandler.thisFrameScale;
+
+            subjectManipHandler.thisFramePosition = subject.transform.position;
+            subjectManipHandler.thisFrameRotation = subject.transform.rotation;
+            subjectManipHandler.thisFrameScale    = subject.transform.lossyScale;
         }
-        runHighlighter ();
+        runHighlighter();
     }
 
     void updatePointsIfNecessary() {
@@ -123,10 +137,10 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 			Vector3 direction1 = oldPointsForRotation[0] - oldPointsForRotation[1];
 			Vector3 direction2 = focalPoints [0].transform.position - focalPoints [1].transform.position;
 			Vector3 cross = Vector3.Cross (direction1, direction2);
-			float amountToRot = Vector3.Angle (direction1, direction2);
-			transform.RotateAround(transform.position, cross.normalized, amountToRot);
+            float amountToRot = Vector3.Angle(direction1, direction2);
+            transform.Rotate(cross.normalized, amountToRot, Space.World);
 
-			oldPointsForRotation [0] = focalPoints [0].transform.position;
+            oldPointsForRotation [0] = focalPoints [0].transform.position;
 			oldPointsForRotation [1] = focalPoints [1].transform.position;
 		} else if (focalPoints.Count == 3) {
 			// TODO Talk to a proper comp sci person about a better way to do this...
@@ -138,7 +152,7 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 			float sign = Vector3.Cross(transform.InverseTransformDirection(transform.right), projectedReference).z < 0 ? -1 : 1;
 			levelingAngle *= sign;
 			transform.Rotate (transform.InverseTransformDirection(transform.forward), levelingAngle);
-		} else if (focalPoints.Count > 3) {
+        } else if (focalPoints.Count > 3) {
 			// TODO I have no idea how to solve for this
 		}
 	}
