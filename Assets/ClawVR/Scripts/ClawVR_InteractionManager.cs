@@ -43,8 +43,8 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 		applyRotation ();
 		if (anyPointChangedThisFrame) {
 			if (focalPoints.Count == 0) {
-				if (subjectManipHandler != null) {
-					subjectManipHandler.release ();
+                if (subjectManipHandler != null) {
+                    subjectManipHandler.release ();
 				}
 			} else {
 				subjectPreviousParent = subject.transform.parent;
