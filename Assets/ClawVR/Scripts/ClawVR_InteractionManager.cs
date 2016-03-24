@@ -12,11 +12,10 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	private Vector3[] oldPointsForRotation = new Vector3[2];
 	private Light selectionHighlighter;
 	private ClawVR_ManipulationHandler subjectManipHandler;
-	public GameObject laserCollider { get; set; }
+    public Plane laserPlane { get; set; }
 
 	void Start () {
         clawControllers = new List<ClawVR_HandController>();
-        laserCollider = transform.Find ("Laser Collider").gameObject;
 		selectionHighlighter = FindObjectOfType<Light> ();
 		this.changeSubject(GameObject.Find("Cube"));
 	}
@@ -89,9 +88,12 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 					}
 				}
 			} else if (controllersThatAreClosed > 1) {
-				// only add 1st focal point for each controller
-				focalPoints.Add (clawController.gameObject.transform.Find ("ClawFocalPoint").gameObject);
-			}
+                // only add 1st focal point for each controller
+                Transform foundTransform = clawController.gameObject.transform.Find("ClawFocalPoint");
+                if (foundTransform != null) {
+                    focalPoints.Add(foundTransform.gameObject);
+                }
+            }
 		}
 	}
 
@@ -172,10 +174,8 @@ public class ClawVR_InteractionManager : MonoBehaviour {
     public void changeSubject(GameObject newSubject) {
         subject = newSubject;
 		if (newSubject == null) {
-			laserCollider.transform.SetParent (null);
             selectionHighlighter.gameObject.SetActive(false);
         } else {
-			laserCollider.transform.SetParent (subject.transform);
             selectionHighlighter.gameObject.SetActive(true);
         }
     }
@@ -184,4 +184,8 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 		clawControllers.Add (c);
         c.ixdManager = this;
 	}
+
+    public void setLaserPlane(Vector3 worldNormal, Vector3 worldPoint) {
+        laserPlane.SetNormalAndPosition(worldNormal.normalized, worldPoint);
+    }
 }

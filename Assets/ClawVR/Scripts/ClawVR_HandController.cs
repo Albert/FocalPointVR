@@ -7,7 +7,7 @@ public class ClawVR_HandController : MonoBehaviour {
 
     public bool isClosed { get; set; }
     private bool laserMode;
-    private bool samePointsAsLastFrame = true;
+    public bool samePointsAsLastFrame { get; set; }
 
     public GameObject pathSpritePrefab;
     private GameObject pathSpriteContainer;
@@ -17,6 +17,7 @@ public class ClawVR_HandController : MonoBehaviour {
     private GameObject[] handSprites = new GameObject[3];
 
     public void Start() {
+        samePointsAsLastFrame = true;
         handSprites[0] = transform.Find("open").gameObject;
         handSprites[1] = transform.Find("closed").gameObject;
         handSprites[2] = transform.Find("pointer").gameObject;
@@ -76,26 +77,22 @@ public class ClawVR_HandController : MonoBehaviour {
     }
 
     private void positionClawOnLaserCollider(Ray laserRay) {
-        RaycastHit hit;
-        GameObject l = ixdManager.laserCollider;
-        Collider c = l.GetComponent<Collider>();
-        if (c.Raycast(laserRay, out hit, 99999)) {
-            transform.position = hit.point - transform.TransformVector(pincerDifference);
+        float distance;
+        if (ixdManager.laserPlane.Raycast(laserRay, out distance)) {
+            transform.position = laserRay.GetPoint(distance) - transform.TransformVector(pincerDifference);
         }
     }
 
     private void setLaserCollider(Ray laserRay) {
-        GameObject l = ixdManager.laserCollider;
         RaycastHit hit;
         if (ixdManager.subject != null) {
             Collider s = ixdManager.subject.GetComponent<Collider>();
             if (s.Raycast(laserRay, out hit, 99999)) {
                 transform.position = hit.point - transform.TransformVector(pincerDifference);
-                l.transform.position = hit.point;
-                l.transform.up = hit.normal;
-                l.SetActive(true);
+                Plane p = new Plane();
+                p.SetNormalAndPosition(hit.normal, hit.point);
+                ixdManager.laserPlane = p;
             } else {
-                l.SetActive(false);
                 transform.localPosition = Vector3.zero;
             }
         } else {
@@ -127,8 +124,8 @@ public class ClawVR_HandController : MonoBehaviour {
     }
 
     public void OpenClaw() {
-        // TODO: consider making it lerp out
         if (isClosed) {
+            otherHandController().samePointsAsLastFrame = false;
             foreach (Transform child in transform) {
                 if (child.name == "ClawFocalPoint") {
                     Destroy(child.gameObject);
