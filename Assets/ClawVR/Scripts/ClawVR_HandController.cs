@@ -84,18 +84,19 @@ public class ClawVR_HandController : MonoBehaviour {
 
     void showCorrectSprites() {
 		if (ixdManager.selectionMode) {
-			displayPathSprite (4);
+			displayPathSprite(4);
 	        displayHandSprite(2);
-			pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1.0f, 1.0f);
+            transform.localPosition = Vector3.zero;
+			pathSpriteContainer.transform.localScale = new Vector3(9999999.9f, 1.0f, 1.0f);
 		} else {
-	        if (ixdManager.laserMode) {
+            if (isClosed) {
+                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
+            } else {
+                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1.0f, 1.0f);
+            }
+            if (ixdManager.laserMode) {
 	            displayHandSprite(2);
 				displayPathSprite (0);
-	            if (isClosed) {
-	                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
-	            } else {
-	                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1.0f, 1.0f);
-	            }
 	        } else {
 				displayPathSprite (2);
 	            if (isClosed) {

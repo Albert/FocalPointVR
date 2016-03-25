@@ -20,43 +20,45 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 		selectionMode = true;
         clawControllers = new List<ClawVR_HandController>();
 		selectionHighlighter = FindObjectOfType<Light> ();
-		this.changeSubject(GameObject.Find("Cube"));
+		//this.changeSubject(GameObject.Find("Cube"));
 	}
 
     void Update () {
     }
 
     void LateUpdate() {
-        updatePointsIfNecessary();
-		if (anyPointChangedThisFrame && subject.transform.parent != transform && subjectManipHandler != null) {
-            subjectManipHandler.capture();
-		}
-        if (anyPointChangedThisFrame && subject.transform.parent == transform) {
-            // kick out permanently for released objects, temporarily for if focal points just rearrange
-            subject.transform.SetParent(subjectPreviousParent);
-        }
-        applyTranslation ();
-		applyScale ();
-		applyRotation ();
-		if (anyPointChangedThisFrame) {
-			if (focalPoints.Count == 0) {
-                if (subjectManipHandler != null) {
-                    subjectManipHandler.release ();
-				}
-			} else {
-				subjectPreviousParent = subject.transform.parent;
-				subject.transform.SetParent (transform);
-			}
-		} else if (subjectManipHandler) {
-            subjectManipHandler.lastFramePosition = subjectManipHandler.thisFramePosition;
-            subjectManipHandler.lastFrameRotation = subjectManipHandler.thisFrameRotation;
-            subjectManipHandler.lastFrameScale    = subjectManipHandler.thisFrameScale;
+        if (subject != null) {
+            updatePointsIfNecessary();
+		    if (anyPointChangedThisFrame && subject.transform.parent != transform && subjectManipHandler != null) {
+                subjectManipHandler.capture();
+		    }
+            if (anyPointChangedThisFrame && subject.transform.parent == transform) {
+                // kick out permanently for released objects, temporarily for if focal points just rearrange
+                subject.transform.SetParent(subjectPreviousParent);
+            }
+            applyTranslation ();
+		    applyScale ();
+		    applyRotation ();
+		    if (anyPointChangedThisFrame) {
+			    if (focalPoints.Count == 0) {
+                    if (subjectManipHandler != null) {
+                        subjectManipHandler.release ();
+				    }
+			    } else {
+				    subjectPreviousParent = subject.transform.parent;
+				    subject.transform.SetParent (transform);
+			    }
+		    } else if (subjectManipHandler) {
+                subjectManipHandler.lastFramePosition = subjectManipHandler.thisFramePosition;
+                subjectManipHandler.lastFrameRotation = subjectManipHandler.thisFrameRotation;
+                subjectManipHandler.lastFrameScale    = subjectManipHandler.thisFrameScale;
 
-            subjectManipHandler.thisFramePosition = subject.transform.position;
-            subjectManipHandler.thisFrameRotation = subject.transform.rotation;
-            subjectManipHandler.thisFrameScale    = subject.transform.lossyScale;
+                subjectManipHandler.thisFramePosition = subject.transform.position;
+                subjectManipHandler.thisFrameRotation = subject.transform.rotation;
+                subjectManipHandler.thisFrameScale    = subject.transform.lossyScale;
+            }
+            runHighlighter();
         }
-        runHighlighter();
     }
 
     void updatePointsIfNecessary() {
@@ -170,8 +172,11 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	}
 
     public void changeSubject(GameObject newSubject) {
+        if (subject != null) {
+            subject.transform.SetParent(subjectPreviousParent);
+        }
         subject = newSubject;
-		if (newSubject == null) {
+        if (subject == null) {
             selectionHighlighter.gameObject.SetActive(false);
             subjectManipHandler = null;
 			selectionMode = true;

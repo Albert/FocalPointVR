@@ -57,8 +57,11 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 //		if (true == true) {
 //			if (Input.GetKeyDown(KeyCode.UpArrow)) {
                 foreach (ClawVR_HandController controller in ixdManager.clawControllers) {
-					float delta = (ixdManager.subject.transform.position - transform.position).magnitude;
-					controller.TelescopeAbsolutely(delta);
+                    Collider subjCollider = ixdManager.subject.GetComponent<Collider>();
+                    float delta = (ixdManager.subject.transform.position - transform.position).magnitude - subjCollider.bounds.extents.magnitude / 2.0f - 2.0f;
+                    if (delta > controller.GetScopeDistance()) {
+                        controller.TelescopeAbsolutely(delta);
+                    }
                 }
 //				clawController.DeployLaser ();
 				telescopeInterrupted = true;
@@ -74,15 +77,14 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 	}
 
 	void findSelection() {
-		if (SteamVR_Controller.Input (controllerIndex).GetTouchDown (SteamVR_Controller.ButtonMask.Trigger)) {
+		if (SteamVR_Controller.Input (controllerIndex).GetHairTriggerDown()) {
 			ixdManager.selectionMode = true;
 		}
-		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger)) {
+        if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x > 0.999f) {
 			ixdManager.changeSubject(clawController.hoveredSubject);
-			ixdManager.selectionMode = false;
 		}
-		if (SteamVR_Controller.Input (controllerIndex).GetTouchUp (SteamVR_Controller.ButtonMask.Trigger)) {
-			ixdManager.selectionMode = false;
+        if (SteamVR_Controller.Input(controllerIndex).GetHairTriggerUp()) {
+            ixdManager.selectionMode = false;
 		}
 	}
 }
