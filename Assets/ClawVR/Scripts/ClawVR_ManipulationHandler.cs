@@ -31,6 +31,8 @@ public class ClawVR_ManipulationHandler : MonoBehaviour {
     private Vector3 translationInertiaVelocity;
     private Quaternion rotationInertiaDelta;
 
+    public bool isCaptured { get; set; }
+
     public enum grabOrLaser {
         grab,laser
     }
@@ -57,6 +59,7 @@ public class ClawVR_ManipulationHandler : MonoBehaviour {
     }
 
     public void capture() {
+        isCaptured = true;
         timeOfRelease = -99999;
         if (isPhysicsBased) {
             prevKinematicState = rbody.isKinematic;
@@ -65,6 +68,7 @@ public class ClawVR_ManipulationHandler : MonoBehaviour {
     }
 
     public void release() {
+        isCaptured = false;
         if (isPhysicsBased) {
             rbody.isKinematic = prevKinematicState;
             if (translationInertiaOnRelease) {
