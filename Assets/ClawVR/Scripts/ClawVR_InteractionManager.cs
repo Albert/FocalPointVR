@@ -14,8 +14,10 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	private ClawVR_ManipulationHandler subjectManipHandler;
     public Plane laserPlane { get; set; }
     public bool laserMode { get; set; }
+    public bool selectionMode { get; set; }
 
     void Start () {
+		selectionMode = true;
         clawControllers = new List<ClawVR_HandController>();
 		selectionHighlighter = FindObjectOfType<Light> ();
 		this.changeSubject(GameObject.Find("Cube"));
@@ -26,11 +28,6 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 
     void LateUpdate() {
         updatePointsIfNecessary();
-        if (subject == null) {
-            subjectManipHandler = null;
-        } else {
-            subjectManipHandler = subject.GetComponent<ClawVR_ManipulationHandler>();
-        }
 		if (anyPointChangedThisFrame && subject.transform.parent != transform && subjectManipHandler != null) {
             subjectManipHandler.capture();
 		}
@@ -176,12 +173,20 @@ public class ClawVR_InteractionManager : MonoBehaviour {
         subject = newSubject;
 		if (newSubject == null) {
             selectionHighlighter.gameObject.SetActive(false);
+            subjectManipHandler = null;
+			selectionMode = true;
         } else {
             selectionHighlighter.gameObject.SetActive(true);
+            subjectManipHandler = subject.GetComponent<ClawVR_ManipulationHandler>();
+			if (subjectManipHandler != null && subjectManipHandler.reactsTo == ClawVR_ManipulationHandler.grabOrLaser.laser) {
+				laserMode = true;
+			} else {
+				laserMode = false;
+			}
         }
     }
 
-	public void registerClaw(ClawVR_HandController c) {
+    public void registerClaw(ClawVR_HandController c) {
 		clawControllers.Add (c);
         c.ixdManager = this;
 	}

@@ -5,14 +5,15 @@ using System.Collections;
 public class ClawVR_ManipulationHandler : MonoBehaviour {
     
 	public bool isSelectable = true;
-	public bool lockTranslation;
-	public bool lockRotation;
+    public bool lockTranslation;
+    public bool lockRotation;
 	public bool lockScale;
     public bool translationInertiaOnRelease;
     public bool rotationInertiaOnRelease;
     public float flickAnimationLength = 0.3f;
     public float translationInertiaThreshold = 8f;
     public float rotationInertiaThreshold = 5f;
+    public grabOrLaser reactsTo;
 
     public Vector3 thisFramePosition { get; set; }
     public Quaternion thisFrameRotation { get; set; }
@@ -29,6 +30,10 @@ public class ClawVR_ManipulationHandler : MonoBehaviour {
     private float timeOfRelease = -99999;
     private Vector3 translationInertiaVelocity;
     private Quaternion rotationInertiaDelta;
+
+    public enum grabOrLaser {
+        grab,laser
+    }
 
     void Start () {
         rbody = GetComponent<Rigidbody>();

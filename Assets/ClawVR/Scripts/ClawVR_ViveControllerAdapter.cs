@@ -57,7 +57,8 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 //		if (true == true) {
 //			if (Input.GetKeyDown(KeyCode.UpArrow)) {
                 foreach (ClawVR_HandController controller in ixdManager.clawControllers) {
-                    controller.DeployLaser();
+					float delta = (ixdManager.subject.transform.position - transform.position).magnitude;
+					controller.TelescopeAbsolutely(delta);
                 }
 //				clawController.DeployLaser ();
 				telescopeInterrupted = true;
@@ -73,11 +74,15 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 	}
 
 	void findSelection() {
-
-
+		if (SteamVR_Controller.Input (controllerIndex).GetTouchDown (SteamVR_Controller.ButtonMask.Trigger)) {
+			ixdManager.selectionMode = true;
+		}
 		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger)) {
-//		if (Input.GetKeyDown(KeyCode.S)) {
 			ixdManager.changeSubject(clawController.hoveredSubject);
+			ixdManager.selectionMode = false;
+		}
+		if (SteamVR_Controller.Input (controllerIndex).GetTouchUp (SteamVR_Controller.ButtonMask.Trigger)) {
+			ixdManager.selectionMode = false;
 		}
 	}
 }

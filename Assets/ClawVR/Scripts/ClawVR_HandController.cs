@@ -31,10 +31,12 @@ public class ClawVR_HandController : MonoBehaviour {
         pathSpriteContainer.transform.parent = transform.parent;
         // TODO: there's got to be a better way to do this...
         pathSpriteComponents = new GameObject[] {
-            transform.parent.Find("Path Sprite(Clone)/Laser1").gameObject,
-            transform.parent.Find("Path Sprite(Clone)/Laser2").gameObject,
+			transform.parent.Find("Path Sprite(Clone)/LaserMode1").gameObject,
+			transform.parent.Find("Path Sprite(Clone)/LaserMode2").gameObject,
             transform.parent.Find("Path Sprite(Clone)/Telescope1").gameObject,
-            transform.parent.Find("Path Sprite(Clone)/Telescope2").gameObject
+            transform.parent.Find("Path Sprite(Clone)/Telescope2").gameObject,
+			transform.parent.Find("Path Sprite(Clone)/Selection1").gameObject,
+			transform.parent.Find("Path Sprite(Clone)/Selection2").gameObject,
         };
     }
 
@@ -81,19 +83,27 @@ public class ClawVR_HandController : MonoBehaviour {
     }
 
     void showCorrectSprites() {
-        if (ixdManager.laserMode) {
-            displayHandSprite(2);
-            if (isClosed) {
-                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
-            } else {
-                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1.0f, 1.0f);
-            }
-        } else {
-            if (isClosed) {
-                displayHandSprite(1);
-            } else {
-                displayHandSprite(0);
-            }
+		if (ixdManager.selectionMode) {
+			displayPathSprite (4);
+	        displayHandSprite(2);
+			pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1.0f, 1.0f);
+		} else {
+	        if (ixdManager.laserMode) {
+	            displayHandSprite(2);
+				displayPathSprite (0);
+	            if (isClosed) {
+	                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
+	            } else {
+	                pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1.0f, 1.0f);
+	            }
+	        } else {
+				displayPathSprite (2);
+	            if (isClosed) {
+	                displayHandSprite(1);
+	            } else {
+	                displayHandSprite(0);
+	            }
+			}
         }
     }
 
@@ -146,7 +156,9 @@ public class ClawVR_HandController : MonoBehaviour {
 
     public void OpenClaw() {
         if (isClosed) {
-            otherHandController().samePointsAsLastFrame = false;
+            if (otherHandController() != null) {
+                otherHandController().samePointsAsLastFrame = false;
+            }
             foreach (Transform child in transform) {
                 if (child.name == "ClawFocalPoint") {
                     Destroy(child.gameObject);
@@ -159,34 +171,11 @@ public class ClawVR_HandController : MonoBehaviour {
         }
     }
 
-    public void DeployLaser() {
-        ixdManager.laserMode = true;
-        pathSpriteContainer.transform.localScale = new Vector3(9999.9f, 1, 1);
-        pathSpriteComponents[0].SetActive(true);
-        pathSpriteComponents[1].SetActive(true);
-        pathSpriteComponents[2].SetActive(false);
-        pathSpriteComponents[3].SetActive(false);
-    }
-
-    public void DeployTelescope() {
-        ixdManager.laserMode = false;
-        if (isClosed) {
-            pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
-        } else {
-            pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 1, 1);
-        }
-        pathSpriteComponents[0].SetActive(false);
-        pathSpriteComponents[1].SetActive(false);
-        pathSpriteComponents[2].SetActive(true);
-        pathSpriteComponents[3].SetActive(true);
-    }
-
     public void TelescopeRelatively(float amount) {
         transform.localPosition = transform.localPosition + new Vector3(0, 0, amount);
         if (transform.localPosition.z < 0) {
             transform.localPosition = Vector3.zero;
         }
-        DeployTelescope();
     }
 
     public void TelescopeAbsolutely(float amount) {
@@ -194,7 +183,6 @@ public class ClawVR_HandController : MonoBehaviour {
         if (transform.localPosition.z < 0) {
             transform.localPosition = Vector3.zero;
         }
-        DeployTelescope();
     }
 
     public float GetScopeDistance() {
@@ -210,6 +198,12 @@ public class ClawVR_HandController : MonoBehaviour {
     void displayHandSprite(int index) {
         for (int i = 0; i < handSprites.Length; i++) {
             handSprites[i].SetActive(index == i);
+        }
+    }
+
+    void displayPathSprite(int index) {
+        for (int i = 0; i < pathSpriteComponents.Length; i++) {
+			pathSpriteComponents[i].SetActive(index == i || index + 1 == i);
         }
     }
 
