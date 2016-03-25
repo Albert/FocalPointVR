@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+//[RequireComponent<Collider>()]
 
 public class ClawVR_ManipulationHandler : MonoBehaviour {
+    
 	public bool isSelectable = true;
 	public bool lockTranslation;
 	public bool lockRotation;
