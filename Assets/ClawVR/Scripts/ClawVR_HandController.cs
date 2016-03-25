@@ -35,8 +35,8 @@ public class ClawVR_HandController : MonoBehaviour {
 			transform.parent.Find("Path Sprite(Clone)/LaserMode2").gameObject,
             transform.parent.Find("Path Sprite(Clone)/Telescope1").gameObject,
             transform.parent.Find("Path Sprite(Clone)/Telescope2").gameObject,
-			transform.parent.Find("Path Sprite(Clone)/Selection1").gameObject,
-			transform.parent.Find("Path Sprite(Clone)/Selection2").gameObject,
+            transform.parent.Find("Path Sprite(Clone)/Selection1").gameObject,
+            transform.parent.Find("Path Sprite(Clone)/Selection2").gameObject
         };
     }
 
@@ -44,22 +44,22 @@ public class ClawVR_HandController : MonoBehaviour {
         reassignHoveredObject();
         showCorrectSprites();
         if (ixdManager.laserMode) {
-            Ray laserRay = new Ray(transform.parent.position, transform.parent.transform.forward);
-            bool otherHandIsClosed = (otherHandController() != null && otherHandController().isClosed);
-            if (isClosed) {
-                if (!otherHandIsClosed) {
-                    setLaserCollider(laserRay);
-                }
-                positionClawOnLaserCollider(laserRay);
-            } else {
-                if (otherHandIsClosed) {
-                    positionClawOnLaserCollider(laserRay);
-                } else {
-                    setLaserCollider(laserRay);
-                }
-                pathSpriteContainer.transform.localScale = new Vector3(99999, 1.0f, 1.0f);
-            }
-        }
+	        Ray laserRay = new Ray(transform.parent.position, transform.parent.transform.forward);
+	        bool otherHandIsClosed = (otherHandController() != null && otherHandController().isClosed);
+	        if (isClosed) {
+	            if (!otherHandIsClosed) {
+	                setLaserCollider(laserRay);
+	            }
+	            positionClawOnLaserCollider(laserRay);
+	        } else {
+	            if (otherHandIsClosed) {
+	                positionClawOnLaserCollider(laserRay);
+	            } else {
+	                setLaserCollider(laserRay);
+	            }
+	            pathSpriteContainer.transform.localScale = new Vector3(99999, 1.0f, 1.0f);
+	        }
+		}
     }
 
     void reassignHoveredObject() {

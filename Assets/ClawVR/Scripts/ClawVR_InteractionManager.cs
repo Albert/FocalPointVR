@@ -10,7 +10,7 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	private List<GameObject> focalPoints = new List<GameObject>();
 	private bool anyPointChangedThisFrame;
 	private Vector3[] oldPointsForRotation = new Vector3[2];
-	private Light selectionHighlighter;
+	private Light[] selectionHighlighters;
 	private ClawVR_ManipulationHandler subjectManipHandler;
     public Plane laserPlane { get; set; }
     public bool laserMode { get; set; }
@@ -19,9 +19,9 @@ public class ClawVR_InteractionManager : MonoBehaviour {
     void Start () {
 		selectionMode = true;
         clawControllers = new List<ClawVR_HandController>();
-		selectionHighlighter = FindObjectOfType<Light> ();
-		//this.changeSubject(GameObject.Find("Cube"));
-	}
+        selectionHighlighters = GetComponentsInChildren<Light>();
+        //this.changeSubject(GameObject.Find("Cube"));
+    }
 
     void Update () {
     }
@@ -163,12 +163,16 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 		if (subject) {
 			Collider col = subject.GetComponent<Collider> ();
 			float mag = col.bounds.extents.magnitude;
-			float animLength = 3.0f;
-			float t = (Time.time % animLength);
-			selectionHighlighter.range = Mathf.Lerp (mag / 2.0f, mag * 4.0f, t / animLength);
-			selectionHighlighter.intensity = Mathf.Lerp (3, 0, t / animLength);
-			selectionHighlighter.gameObject.transform.position = subject.transform.position;
-		}
+            for (int i = 0; i < selectionHighlighters.Length; i++) {
+                float portion = (float)i / (float)selectionHighlighters.Length;
+                float animLength = 3.0f;
+                float modifiedTime = Time.time + animLength * portion;
+                float t = (modifiedTime % animLength);
+                selectionHighlighters[i].range = Mathf.Lerp(mag / 2.0f, mag * 6.0f, t / animLength);
+                selectionHighlighters[i].intensity = Mathf.Lerp(2, 0, t / animLength);
+                selectionHighlighters[i].gameObject.transform.position = subject.transform.position;
+            }
+        }
 	}
 
     public void changeSubject(GameObject newSubject) {
@@ -177,11 +181,15 @@ public class ClawVR_InteractionManager : MonoBehaviour {
         }
         subject = newSubject;
         if (subject == null) {
-            selectionHighlighter.gameObject.SetActive(false);
+            foreach (Light l in selectionHighlighters) {
+                l.gameObject.SetActive(false);
+            }
             subjectManipHandler = null;
 			selectionMode = true;
         } else {
-            selectionHighlighter.gameObject.SetActive(true);
+            foreach (Light l in selectionHighlighters) {
+                l.gameObject.SetActive(true);
+            }
             subjectManipHandler = subject.GetComponent<ClawVR_ManipulationHandler>();
 			if (subjectManipHandler != null && subjectManipHandler.reactsTo == ClawVR_ManipulationHandler.grabOrLaser.laser) {
 				laserMode = true;
