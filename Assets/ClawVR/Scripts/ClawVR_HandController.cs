@@ -6,13 +6,13 @@ public class ClawVR_HandController : MonoBehaviour {
     private Vector3 pincerDifference = new Vector3(0, 0, 0.09f);
 
     public bool isClosed { get; set; }
-    private bool laserMode;
     public bool samePointsAsLastFrame { get; set; }
 
     public GameObject pathSpritePrefab;
     private GameObject pathSpriteContainer;
     private GameObject[] pathSpriteComponents;
     public ClawVR_InteractionManager ixdManager { get; set; }
+    public GameObject hoveredSubject { get; set; }
 
     private GameObject[] handSprites = new GameObject[3];
 
@@ -39,8 +39,9 @@ public class ClawVR_HandController : MonoBehaviour {
     }
 
     void Update() {
+        reassignHoveredObject();
         showCorrectSprites();
-        if (laserMode) {
+        if (ixdManager.laserMode) {
             Ray laserRay = new Ray(transform.parent.position, transform.parent.transform.forward);
             bool otherHandIsClosed = (otherHandController() != null && otherHandController().isClosed);
             if (isClosed) {
@@ -59,8 +60,28 @@ public class ClawVR_HandController : MonoBehaviour {
         }
     }
 
+    void reassignHoveredObject() {
+        Ray selectionRay = new Ray(transform.parent.position, transform.parent.transform.forward);
+        RaycastHit[] hits;
+        hits = Physics.RaycastAll(selectionRay);
+        float closestDistance = 999999999.9f;
+        hoveredSubject = null;
+        foreach (RaycastHit hit in hits) {
+            // TODO: there has to be a better way...
+            if (hit.distance < closestDistance) {
+                ClawVR_ManipulationHandler manipHandler = hit.collider.gameObject.GetComponent<ClawVR_ManipulationHandler>();
+                if ((manipHandler != null && manipHandler.isSelectable) || (ixdManager.canSelectAnyObject && manipHandler == null)) {
+                    if (hit.collider.gameObject.name != "Laser Collider") {
+                        closestDistance = hit.distance;
+                        hoveredSubject = hit.collider.gameObject;
+                    }
+                }
+            }
+        }
+    }
+
     void showCorrectSprites() {
-        if (laserMode) {
+        if (ixdManager.laserMode) {
             displayHandSprite(2);
             if (isClosed) {
                 pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
@@ -102,7 +123,7 @@ public class ClawVR_HandController : MonoBehaviour {
 
     public void CloseClaw() {
         if (!isClosed) {
-            if (laserMode) {
+            if (ixdManager.laserMode) {
                 if (transform.localPosition != Vector3.zero) {
                     GameObject focalPoint = new GameObject("ClawFocalPoint");
                     focalPoint.transform.localPosition = pincerDifference;
@@ -139,7 +160,7 @@ public class ClawVR_HandController : MonoBehaviour {
     }
 
     public void DeployLaser() {
-        laserMode = true;
+        ixdManager.laserMode = true;
         pathSpriteContainer.transform.localScale = new Vector3(9999.9f, 1, 1);
         pathSpriteComponents[0].SetActive(true);
         pathSpriteComponents[1].SetActive(true);
@@ -148,7 +169,7 @@ public class ClawVR_HandController : MonoBehaviour {
     }
 
     public void DeployTelescope() {
-        laserMode = false;
+        ixdManager.laserMode = false;
         if (isClosed) {
             pathSpriteContainer.transform.localScale = new Vector3(transform.localPosition.z, 6.0f, 6.0f);
         } else {

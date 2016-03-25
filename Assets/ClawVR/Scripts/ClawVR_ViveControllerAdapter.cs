@@ -73,27 +73,11 @@ public class ClawVR_ViveControllerAdapter : MonoBehaviour {
 	}
 
 	void findSelection() {
-		Ray controllerRay = new Ray(transform.position, transform.forward);
-		RaycastHit[] hits;
-		hits = Physics.RaycastAll (controllerRay);
-		float closestDistance = 999999999.9f;
-		hoveredSubject = null;
-		foreach (RaycastHit hit in hits) {
-			// TODO: there has to be a better way...
-			if (hit.distance < closestDistance) {
-				ClawVR_ManipulationHandler manipHandler = hit.collider.gameObject.GetComponent<ClawVR_ManipulationHandler> ();
-				if ((manipHandler != null && manipHandler.isSelectable) || (ixdManager.canSelectAnyObject && manipHandler == null)) {
-                    if (hit.collider.gameObject.name != "Laser Collider") {
-                        closestDistance = hit.distance;
-                        hoveredSubject = hit.collider.gameObject;
-                    }
-                }
-			}
-		}
+
 
 		if (SteamVR_Controller.Input(controllerIndex).GetPressDown(SteamVR_Controller.ButtonMask.Trigger)) {
 //		if (Input.GetKeyDown(KeyCode.S)) {
-			ixdManager.changeSubject(hoveredSubject);
+			ixdManager.changeSubject(clawController.hoveredSubject);
 		}
 	}
 }

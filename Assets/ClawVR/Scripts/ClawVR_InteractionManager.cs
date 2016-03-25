@@ -13,8 +13,9 @@ public class ClawVR_InteractionManager : MonoBehaviour {
 	private Light selectionHighlighter;
 	private ClawVR_ManipulationHandler subjectManipHandler;
     public Plane laserPlane { get; set; }
+    public bool laserMode { get; set; }
 
-	void Start () {
+    void Start () {
         clawControllers = new List<ClawVR_HandController>();
 		selectionHighlighter = FindObjectOfType<Light> ();
 		this.changeSubject(GameObject.Find("Cube"));
