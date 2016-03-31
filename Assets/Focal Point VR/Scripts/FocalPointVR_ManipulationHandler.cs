@@ -4,15 +4,15 @@ using System.Collections;
 
 public class FocalPointVR_ManipulationHandler : MonoBehaviour {
 
-    public bool isSelectable = true;
     public bool lockTranslation;
     public bool lockRotation;
     public bool lockScale;
     public bool translationInertiaOnRelease = true;
+	public float translationInertiaThreshold = 8f;
     public bool rotationInertiaOnRelease = true;
-    public float flickAnimationLength = 0.3f;
-    public float translationInertiaThreshold = 8f;
     public float rotationInertiaThreshold = 5f;
+    public float flickAnimationLength = 0.3f;
+	public bool isSelectable = true;
 
     public Vector3 thisFramePosition { get; set; }
     public Quaternion thisFrameRotation { get; set; }
