@@ -61,7 +61,7 @@ public class FocalPointVR_SteamVRControllerAdapterDemo2 : MonoBehaviour {
             }
         }
         if (SteamVR_Controller.Input(controllerIndex).GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger).x > 0.999f) {
-            if (ixdManager.subject != hoveredSubject) {
+            if (ixdManager.subject != hoveredSubject && hoveredSubject != null) {
                 ixdManager.changeSubject(hoveredSubject);
             }
         }
