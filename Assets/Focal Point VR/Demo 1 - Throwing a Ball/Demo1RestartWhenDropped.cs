@@ -19,8 +19,14 @@ public class Demo1RestartWhenDropped : MonoBehaviour {
         if (transform.position.y < -50.0f) {
             transform.position = initialLocation;
             rbody.velocity = Vector3.zero;
-            Destroy(toDestroy.gameObject);
-            toDestroy = Instantiate(wallPrefab, initialWallLocation, Quaternion.identity) as GameObject;
+            rbody.freezeRotation = true;
+            if (Mathf.Abs(transform.localScale.x) > 5.0f) {
+                transform.localScale = new Vector3 (5, 5, 5);
+            }
+            Destroy (toDestroy.gameObject);
+            toDestroy = Instantiate (wallPrefab, initialWallLocation, Quaternion.identity) as GameObject;
+        } else {
+            rbody.freezeRotation = false;
         }
     }
 }
