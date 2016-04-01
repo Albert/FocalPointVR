@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class FocalPointVR_SteamVRAdapterDemo2 : MonoBehaviour {
-    public bool tryOutSyndromeMode;
+    public bool enablePinnedMode;
     public GameObject handPrefab;
     private GameObject[] controllers = new GameObject[2];
     private FocalPointVR_InteractionManager ixdManager;
@@ -34,7 +34,7 @@ public class FocalPointVR_SteamVRAdapterDemo2 : MonoBehaviour {
     void Update() {
         foreach (GameObject controller in controllers) {
             FocalPointVR_SteamVRControllerAdapterDemo2 adapter = controller.GetComponent<FocalPointVR_SteamVRControllerAdapterDemo2>();
-            adapter.syndromeMode = tryOutSyndromeMode;
+            adapter.syndromeMode = enablePinnedMode;
         }
     }
 }
