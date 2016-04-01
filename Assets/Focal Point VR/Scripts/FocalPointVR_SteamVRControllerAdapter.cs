@@ -10,6 +10,9 @@ public class FocalPointVR_SteamVRControllerAdapter : MonoBehaviour {
 
     void Start() {
         pointGenerator = GetComponentInChildren<FocalPointVR_PointGenerator>();
+        if (ixdManager == null) {
+            ixdManager = GameObject.FindObjectOfType<FocalPointVR_InteractionManager> ();
+        }
         ixdManager.registerPointGenerator(pointGenerator);
         steamTrackedObj = GetComponent<SteamVR_TrackedObject>();
         controllerIndex = GetComponent<SteamVR_TrackedObject>().index.GetHashCode();
